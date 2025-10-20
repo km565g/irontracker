@@ -66,12 +66,19 @@ HTML_TEMPLATE = '''
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- ✅ КЛЮЧЕВОЕ: корректный mobile viewport -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Iron Tracker</title>
     <style>
+        :root {
+            --radius: 12px;
+            --shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: #f9f9f9;
-            padding: 20px;
+            padding: 16px;
             color: #333;
             display: flex;
             justify-content: center;
@@ -79,52 +86,56 @@ HTML_TEMPLATE = '''
 
         .container {
             width: 100%;
-            max-width: 800px;
+            max-width: 820px;
         }
 
         h1 {
             font-size: 28px;
-            margin-bottom: 10px;
+            margin: 0 0 8px;
             text-align: center;
         }
 
         .date-indicator {
-            font-size: 16px;
+            font-size: 15px;
             color: #666;
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         form {
             background: #fff;
             padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
             width: 100%;
             box-sizing: border-box;
         }
 
         label, p {
-            font-weight: 500;
+            font-weight: 600;
             margin-bottom: 8px;
             display: block;
         }
 
-        input[type="number"], select {
-            padding: 8px 12px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
+        /* поля */
+        select, input[type="number"], input[readonly] {
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid #d9d9d9;
             font-size: 16px;
-            margin-bottom: 10px;
+            line-height: 1.2;
         }
 
         input[readonly] {
-            background: #f1f1f1;
-            border: 1px solid #e0e0e0;
-            width: 90px;
+            background: #f3f3f4;
+            border-color: #e6e6e7;
+            min-width: 90px;   /* не жёсткая ширина, чтобы на мобиле могло растягиваться */
+            width: auto;
             text-align: center;
         }
 
+        /* строка продукта — на десктопе выстраиваем в линию,
+           на мобиле превращаем в колонку */
         #products > .product-row {
             display: flex;
             flex-wrap: wrap;
@@ -133,90 +144,78 @@ HTML_TEMPLATE = '''
             margin-bottom: 10px;
         }
 
+        /* базовое распределение ширин на широком экране */
+        #products .product-row select { flex: 1 1 240px; }
+        #products .product-row input[type="number"] { flex: 1 1 180px; }
+        #products .product-row input[readonly] { flex: 0 0 110px; }
+
         .remove-button {
             background: none;
             border: none;
             color: #888;
             font-size: 14px;
             cursor: pointer;
-            padding: 4px 8px;
+            padding: 6px 8px;
             transition: color 0.2s;
         }
-
-        .remove-button:hover {
-            color: #ff3b30;
-        }
+        .remove-button:hover { color: #ff3b30; }
 
         button, input[type="submit"] {
             background-color: #007aff;
             color: white;
             border: none;
-            padding: 10px 16px;
-            border-radius: 8px;
+            padding: 12px 16px;
+            border-radius: 10px;
             font-size: 16px;
             cursor: pointer;
-            margin-top: 10px;
+            margin-top: 8px;
         }
-
-        button:hover, input[type="submit"]:hover {
-            background-color: #005ecb;
-        }
+        button:hover, input[type="submit"]:hover { background-color: #005ecb; }
 
         .calendar-link {
             display: inline-block;
-            margin-top: 25px;
+            margin-top: 22px;
             background-color: #e5e5ea;
             color: #333;
             padding: 10px 16px;
-            border-radius: 8px;
+            border-radius: 10px;
             text-decoration: none;
-            font-weight: 500;
+            font-weight: 600;
             text-align: center;
         }
+        .calendar-link:hover { background-color: #d1d1d6; }
 
-        .calendar-link:hover {
-            background-color: #d1d1d6;
-        }
-
-        .result-ok {
-            color: green;
-            font-weight: bold;
+        .result-ok, .result-over {
             text-align: center;
+            font-weight: 700;
         }
+        .result-ok  { color: #34c759; }
+        .result-over{ color: #ff3b30; }
 
-        .result-over {
-            color: red;
-            font-weight: bold;
-            text-align: center;
-        }
+        .calendar-container { text-align: center; }
 
-        .calendar-container {
-            text-align: center;
-        }
+        /* 📱 мобильная адаптация */
+        @media (max-width: 640px) {
+            body { padding: 12px; }
+            h1 { font-size: 22px; }
 
-        /* 📱 Адаптация под мобильные устройства */
-        @media (max-width: 600px) {
-            body {
-                padding: 10px;
-            }
-
-            h1 {
-                font-size: 22px;
-            }
-
-            form {
-                padding: 15px;
-            }
+            form { padding: 14px; }
 
             #products > .product-row {
                 flex-direction: column;
                 align-items: stretch;
+                gap: 8px;
             }
 
-            select, input[type="number"], input[readonly] {
+            /* каждая колонка растягивается на всю ширину */
+            #products .product-row select,
+            #products .product-row input[type="number"],
+            #products .product-row input[readonly] {
+                flex: 1 1 100%;
                 width: 100%;
             }
 
+            /* кнопки во всю ширину — удобные для тапа */
             button, input[type="submit"], .calendar-link {
                 width: 100%;
             }
@@ -249,7 +248,7 @@ HTML_TEMPLATE = '''
             </div>
 
             <button type="button" onclick="addProduct()">➕ Add more</button>
-            <br><br>
+            <br>
             <input type="submit" value="💾 Save">
         </form>
 
@@ -299,7 +298,6 @@ HTML_TEMPLATE = '''
                 row.setAttribute("data-index", idx);
                 const selects = row.getElementsByTagName("select");
                 const inputs = row.getElementsByTagName("input");
-
                 if (selects.length > 0) selects[0].setAttribute("name", `product_${idx}`);
                 if (inputs.length > 0) inputs[0].setAttribute("name", `grams_${idx}`);
             });
