@@ -66,37 +66,42 @@ HTML_TEMPLATE = '''
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Iron Tracker — Edit Day</title>
+    <title>Iron Tracker</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: #f9f9f9;
-            padding: 40px;
+            padding: 20px;
             color: #333;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
         }
 
-        .content {
+        .container {
             width: 100%;
-            max-width: 750px;
-            background: #fff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            max-width: 800px;
         }
 
         h1 {
             font-size: 28px;
             margin-bottom: 10px;
+            text-align: center;
         }
 
         .date-indicator {
             font-size: 16px;
             color: #666;
+            text-align: center;
             margin-bottom: 20px;
+        }
+
+        form {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            width: 100%;
+            box-sizing: border-box;
         }
 
         label, p {
@@ -122,6 +127,7 @@ HTML_TEMPLATE = '''
 
         #products > .product-row {
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
             gap: 10px;
             margin-bottom: 10px;
@@ -156,57 +162,77 @@ HTML_TEMPLATE = '''
             background-color: #005ecb;
         }
 
-        .result-ok {
-            color: green;
-            font-weight: bold;
-        }
-
-        .result-over {
-            color: red;
-            font-weight: bold;
-        }
-
-        .calendar-link, .home-link {
+        .calendar-link {
             display: inline-block;
-            margin-top: 20px;
+            margin-top: 25px;
             background-color: #e5e5ea;
             color: #333;
             padding: 10px 16px;
             border-radius: 8px;
             text-decoration: none;
             font-weight: 500;
-            transition: background-color 0.2s;
+            text-align: center;
         }
 
-        .calendar-link:hover, .home-link:hover {
+        .calendar-link:hover {
             background-color: #d1d1d6;
         }
 
-        .home-link {
-            background-color: #007aff;
-            color: #fff;
-            margin-left: 10px;
+        .result-ok {
+            color: green;
+            font-weight: bold;
+            text-align: center;
         }
 
-        .home-link:hover {
-            background-color: #005ecb;
+        .result-over {
+            color: red;
+            font-weight: bold;
+            text-align: center;
         }
 
-        .bottom-nav {
-            margin-top: 40px;
+        .calendar-container {
+            text-align: center;
+        }
+
+        /* 📱 Адаптация под мобильные устройства */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            form {
+                padding: 15px;
+            }
+
+            #products > .product-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            select, input[type="number"], input[readonly] {
+                width: 100%;
+            }
+
+            button, input[type="submit"], .calendar-link {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="content">
+    <div class="container">
         <h1>Iron Tracker</h1>
-        <div class="date-indicator">📅 Editing data for {{ day_text }}</div>
+        <div class="date-indicator">📅 {{ day_text[5:] }}</div>
 
         <form method="post">
             <label><strong>Please specify your maximum daily iron intake (mg):</strong></label>
             <input type="number" step="0.1" name="norm" value="{{ norm }}" required>
 
-            <p><strong>Enter the products you consumed:</strong></p>
+            <p><strong>Enter the products you consumed{{ day_text }}:</strong></p>
             <div id="products">
                 {% for i in range(product_count) %}
                 <div class="product-row" data-index="{{ i }}">
@@ -236,9 +262,8 @@ HTML_TEMPLATE = '''
             </h4>
         {% endif %}
 
-        <div class="bottom-nav">
-            <a href="/calendar" class="calendar-link">📆 Open Calendar</a>
-            <a href="/" class="home-link">🏠 Back to Dashboard</a>
+        <div class="calendar-container">
+            <a href="/calendar" class="calendar-link">📆 Back to Calendar</a>
         </div>
     </div>
 
